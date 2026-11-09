@@ -215,8 +215,14 @@ def _shell_quote(v: str) -> str:
 SCRUBBABLE_FMTS = ("jsonl", "text")
 
 
-def plan_scrub(home: str, findings: list[Finding]):
-    """Redact secrets from local transcripts / histories (not live configs)."""
+def plan_scrub(home: str, findings: list[Finding], skip_recent: float = 0, now: float | None = None):
+    """Redact secrets from local transcripts / histories (not live configs).
+
+    Files modified in the last `skip_recent` minutes are left alone: they may belong to a running session.
+    """
+    import time
+    now = time.time() if now is None else now
+    recent = []
     by_file: dict[str, set] = {}
     json_hist: dict[str, set] = {}
     skipped = []
@@ -237,6 +243,14 @@ def plan_scrub(home: str, findings: list[Finding]):
         else:
             skipped.append(f)
     edits = {}
+    for d in (by_file, json_hist):
+        for rel in list(d):
+            try:
+                if skip_recent and now - os.path.getmtime(os.path.join(home, rel)) < skip_recent * 60:
+                    recent.append(rel)
+                    del d[rel]
+            except OSError:
+                del d[rel]
     for rel, secrets in by_file.items():
         p = os.path.join(home, rel)
         try:
@@ -286,7 +300,7 @@ def plan_scrub(home: str, findings: list[Finding]):
         new = walk(data, "")
         if count[0]:
             edits[rel] = (json.dumps(new, indent=2, ensure_ascii=False) + "\n", count[0])
-    return edits, skipped
+    return edits, skipped, recent
 
 
 def _is_history_field(field: str) -> bool:

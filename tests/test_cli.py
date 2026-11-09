@@ -15,7 +15,7 @@ def run(*a):
 
 def test_version():
     p = run("--version")
-    assert p.returncode == 0 and "0.1.0" in p.stdout
+    assert p.returncode == 0 and "0.1.1" in p.stdout
 
 
 def test_scan_text_never_prints_secret(repo):
@@ -91,6 +91,11 @@ def test_home_scan_and_scrub(tmp_path):
     assert p.returncode == 1 and OPENAI not in p.stdout
     assert "~/.claude/projects/p/s.jsonl" in p.stdout and "~/.claude.json" in p.stdout
     p = run("home", "--home-dir", str(h), "--scrub")
+    assert "modified in the last 10 min" in p.stdout and "would scrub 0" in p.stdout
+    old = 1_700_000_000
+    for f in (h / ".claude/projects/p/s.jsonl", h / ".claude.json"):
+        os.utime(f, (old, old))
+    p = run("home", "--home-dir", str(h), "--scrub")
     assert "would scrub 2" in p.stdout and OPENAI in (h / ".claude/projects/p/s.jsonl").read_text()
     p = run("home", "--home-dir", str(h), "--scrub", "--write")
     t = (h / ".claude/projects/p/s.jsonl").read_text()
@@ -119,3 +124,13 @@ def test_staged_cli(repo):
 
 def test_not_a_directory(tmp_path):
     assert main(["scan", str(tmp_path / "nope")]) == 2
+
+
+def test_home_side_txt_files(tmp_path):
+    h = tmp_path / "home"
+    write(h, ".claude/projects/p/sess/auto-mode-classifier-error.txt", f"blocked: TOKEN={GH} yarn install\n")
+    p = run("home", "--home-dir", str(h), "--format", "json")
+    d = json.loads(p.stdout)
+    assert [f["kind"] for f in d["findings"]] == ["github-token"]
+    p = run("home", "--home-dir", str(h), "--scrub", "--write", "--skip-recent", "0")
+    assert GH not in (h / ".claude/projects/p/sess/auto-mode-classifier-error.txt").read_text()

@@ -120,12 +120,15 @@ def cmd_home(args):
     home = args.home_dir or os.path.expanduser("~")
     findings = sort_findings(scan_home(home))
     if args.scrub:
-        edits, skipped = plan_scrub(home, findings)
+        edits, skipped, recent = plan_scrub(home, findings, args.skip_recent)
         total = sum(n for _, n in edits.values())
         print(f"{'scrubbing' if args.write else 'would scrub'} {total} occurrence(s) in {len(edits)} transcript/history "
               f"file(s):")
         for rel, (_, n) in sorted(edits.items()):
             print(f"  ~/{rel}: {n}")
+        for rel in recent:
+            print(f"skipped ~/{rel}: modified in the last {args.skip_recent:g} min (live session?); "
+                  "rerun after it ends or pass --skip-recent 0")
         if skipped:
             print(f"left alone: {len(skipped)} secret(s) in live config files (move them to env vars by hand):")
             for f in skipped:
@@ -210,6 +213,8 @@ def build_parser():
     h.add_argument("--home-dir", help="home directory to scan (default ~)")
     h.add_argument("--scrub", action="store_true", help="redact found secrets in transcripts and histories")
     h.add_argument("--write", action="store_true", help="with --scrub: actually rewrite files")
+    h.add_argument("--skip-recent", type=float, default=10, metavar="MIN",
+                   help="with --scrub: leave files modified in the last MIN minutes alone (default 10)")
     common(h)
     h.set_defaults(func=cmd_home)
 

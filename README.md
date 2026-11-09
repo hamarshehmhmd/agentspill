@@ -26,7 +26,7 @@ curl -fsSL https://raw.githubusercontent.com/hamarshehmhmd/agentspill/main/insta
 | `agentspill scan https://github.com/you/repo` | Same, for a remote repo (bare, blobless clone into a temp dir). |
 | `agentspill scan --format checklist` | A rotate-first markdown checklist, one item per distinct secret, with where to rotate it. |
 | `agentspill fix [--write]` | Removes permission rules that contain secrets, rewrites MCP configs to the agent's own env syntax (`${VAR}`, `${env:VAR}`, `{env:VAR}`), moves values to a `0600` `.agentspill.env`, adds local-only files to the repo `.gitignore`, untracks them. Dry run by default. |
-| `agentspill home [--scrub --write]` | Local stores outside git: `~/.claude.json` (MCP servers and prompt history), Claude/Codex transcripts and histories, global MCP configs. `--scrub` redacts transcripts and history; live configs are reported, not touched. |
+| `agentspill home [--scrub --write]` | Local stores outside git: `~/.claude.json` (MCP servers and prompt history), Claude/Codex transcripts (incl. subagent transcripts and session side files) and histories, global MCP configs. `--scrub` redacts transcripts and history in place, keeps JSONL valid, and skips files modified in the last 10 minutes (a live session); live configs are reported, not touched. |
 | `agentspill install-hook` / `scan --staged` | Pre-commit: blocks local-only agent files and new secrets in agent files. Also a [pre-commit](https://pre-commit.com) hook and a GitHub Action. |
 
 Output: `text`, `json`, `sarif` (GitHub code scanning), `github` (annotations), `checklist`. Secrets are always redacted in output. Exit code 1 when a finding is at or above `--fail-on` (default `high`).
@@ -35,7 +35,7 @@ Output: `text`, `json`, `sarif` (GitHub code scanning), `github` (annotations), 
 
 | Agent | Files |
 |---|---|
-| Claude Code | `.claude/settings.local.json` (local-only), `.claude/settings.json`, `.mcp.json`, `CLAUDE.md`, `CLAUDE.local.md` (local-only), `.claude/agents`, `.claude/commands`; home: `~/.claude.json`, `~/.claude/projects/**/*.jsonl`, `~/.claude/history.jsonl`, `~/.claude/settings*.json` |
+| Claude Code | `.claude/settings.local.json` (local-only), `.claude/settings.json`, `.mcp.json`, `CLAUDE.md`, `CLAUDE.local.md` (local-only), `.claude/agents`, `.claude/commands`; home: `~/.claude.json`, `~/.claude/projects/**/*.jsonl` and `*.txt`, `~/.claude/history.jsonl`, `~/.claude/settings*.json` |
 | Cursor | `.cursor/mcp.json`, `.cursor/rules/*`, `.cursorrules`; home: `~/.cursor/mcp.json` |
 | VS Code / Copilot | `.vscode/mcp.json` (`servers`, JSONC ok) |
 | Codex | `.codex/config.toml`, `AGENTS.md`; home: `~/.codex/config.toml`, `~/.codex/sessions/**`, `~/.codex/history.jsonl` |
@@ -52,7 +52,7 @@ Works in monorepos (any subdirectory) and skips `node_modules`, virtualenvs and 
 
 ## Demo
 
-[demo.mp4](https://github.com/hamarshehmhmd/agentspill/releases/download/v0.1.0/demo.mp4) (3 min, narrated): scan a demo repo, compare with gitleaks, history + rotate-first checklist, `fix --write`, home stores and scrub, pre-commit hook.
+[demo.mp4](https://github.com/hamarshehmhmd/agentspill/releases/download/v0.1.1/demo.mp4) (3 min, narrated): scan a demo repo, compare with gitleaks, history + rotate-first checklist, `fix --write`, home stores and scrub, pre-commit hook.
 
 Try the same demo repo yourself (all secrets are fake and generated at runtime):
 
@@ -83,7 +83,7 @@ pre-commit framework:
 ```yaml
 repos:
   - repo: https://github.com/hamarshehmhmd/agentspill
-    rev: v0.1.0
+    rev: v0.1.1
     hooks:
       - id: agentspill
 ```
@@ -93,7 +93,7 @@ GitHub Action (use `fetch-depth: 0` so history is scanned):
 ```yaml
 - uses: actions/checkout@v5
   with: { fetch-depth: 0 }
-- uses: hamarshehmhmd/agentspill@v0.1.0
+- uses: hamarshehmhmd/agentspill@v0.1.1
   with:
     fail-on: high
 ```

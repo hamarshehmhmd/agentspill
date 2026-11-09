@@ -59,6 +59,7 @@ HOME_ARTIFACTS = [
     Artifact(".claude/settings.local.json", "claude-code", "user permission rules", "json"),
     Artifact(".claude/history.jsonl", "claude-code", "prompt history", "jsonl"),
     Artifact(".claude/projects/**.jsonl", "claude-code", "session transcripts", "jsonl"),
+    Artifact(".claude/projects/**.txt", "claude-code", "session side files (classifier/error logs)", "text"),
     Artifact(".claude/CLAUDE.md", "claude-code", "user memory file", "text"),
     Artifact(".codex/config.toml", "codex", "config / MCP servers", "toml"),
     Artifact(".codex/history.jsonl", "codex", "prompt history", "jsonl"),

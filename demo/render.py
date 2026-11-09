@@ -87,7 +87,7 @@ SCENES = [
     {
         "kind": "term",
         "cmds": ["agentspill home --home-dir ../demo-home | cut -c1-118",
-                 "agentspill home --home-dir ../demo-home --scrub --write | head -3"],
+                 "agentspill home --home-dir ../demo-home --scrub --write --skip-recent 0 | head -3"],
         "say": "agent spill home checks the stores outside git: the Claude dot json file, session transcripts, "
                "prompt history and Codex config. Scrub redacts secrets from transcripts and history, and leaves live "
                "configs alone.",

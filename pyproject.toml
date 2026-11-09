@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agentspill"
-version = "0.1.0"
+version = "0.1.1"
 description = "Find secrets that coding agents leave in permission rules, MCP configs, memory files and transcripts (Claude Code, Cursor, Codex, Gemini CLI, Copilot), check if they reached git, and move them out."
 readme = "README.md"
 license = "AGPL-3.0-or-later"

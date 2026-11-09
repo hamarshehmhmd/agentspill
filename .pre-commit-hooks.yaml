@@ -1,0 +1,7 @@
+- id: agentspill
+  name: agentspill (secrets in coding-agent files)
+  description: Block commits of Claude Code / Cursor / Codex / Gemini files that contain secrets, and local-only agent files.
+  entry: agentspill scan --staged
+  language: python
+  pass_filenames: false
+  always_run: true

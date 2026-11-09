@@ -1,0 +1,7 @@
+# test fixtures use obviously fake, runtime-built credentials
+[extend]
+useDefault = true
+
+[allowlist]
+description = "fake test fixtures"
+paths = ['''^tests/''']

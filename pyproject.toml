@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentspill"
+version = "0.1.0"
+description = "Find secrets that coding agents leave in permission rules, MCP configs, memory files and transcripts (Claude Code, Cursor, Codex, Gemini CLI, Copilot), check if they reached git, and move them out."
+readme = "README.md"
+license = "AGPL-3.0-or-later"
+license-files = ["LICENSE"]
+authors = [{name = "Mohammad Hamarsheh"}]
+requires-python = ">=3.9"
+dependencies = []
+keywords = ["secrets", "claude-code", "mcp", "cursor", "codex", "gemini-cli", "secret-scanning", "pre-commit", "security", "ai-agents"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Topic :: Security",
+  "Topic :: Software Development :: Quality Assurance",
+]
+
+[project.urls]
+Homepage = "https://github.com/hamarshehmhmd/agentspill"
+Issues = "https://github.com/hamarshehmhmd/agentspill/issues"
+
+[project.scripts]
+agentspill = "agentspill.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

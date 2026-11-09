@@ -1,0 +1,21 @@
+name: agentspill
+description: Find secrets in coding-agent files (Claude Code permission rules, MCP configs, memory files) in the repo and its git history.
+branding:
+  icon: shield
+  color: red
+inputs:
+  args:
+    description: Extra arguments for `agentspill scan`
+    default: "--history"
+  fail-on:
+    description: Fail the job at this severity or above (low, medium, high, critical, none)
+    default: high
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: python3 -m pip install --quiet "${{ github.action_path }}"
+    - shell: bash
+      run: agentspill scan ${{ inputs.args }} --format github --fail-on none
+    - shell: bash
+      run: agentspill --color always scan ${{ inputs.args }} --fail-on ${{ inputs.fail-on }}

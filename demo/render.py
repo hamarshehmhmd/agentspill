@@ -43,7 +43,7 @@ SCENES = [
             "\"Don't ask again\" saves the exact command, password included",
             "   to .claude/settings.local.json, ignored only by a global gitignore",
             "1,122 public copies with secrets on GitHub (Apiiro, Nov 2026)",
-            "MCP configs are meant to be committed; 12% hold hardcoded keys",
+            "MCP configs are meant to be committed; 12% of key slots hardcoded",
             "Most are shapeless: DSN passwords, Bearer headers, -p flags",
         ],
         "say": "When you approve a command in Claude Code with don't ask again, the exact command, password "

@@ -47,8 +47,8 @@ jobs:
           test "$rc" -eq 1
           agentspill scan --history --format json --fail-on none > /tmp/as.json
           python - <<'PY'
-          import json, sys
-          sys.path.insert(0, "examples")
+          import json, os, sys
+          sys.path.insert(0, os.path.join(os.environ["GITHUB_WORKSPACE"], "examples"))
           import make_demo_repo
           d = json.load(open("/tmp/as.json"))
           fps = {f["fingerprint"] for f in d["findings"]}
